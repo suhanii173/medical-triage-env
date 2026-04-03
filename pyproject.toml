@@ -1,0 +1,18 @@
+[project]
+name = "medical-triage-env"
+version = "0.1.0"
+description = "Medical triage OpenEnv environment"
+authors = [
+    {name = "Suhani"}
+]
+dependencies = [
+    "pydantic",
+    "openenv-core",
+    "openai",
+    "huggingface_hub",
+    "fastapi",
+    "uvicorn"
+]
+
+[project.scripts]
+server = "server.app:main"
