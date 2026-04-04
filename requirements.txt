@@ -1,5 +1,4 @@
-gradio
+gradio==4.0.0
 fastapi
 uvicorn
 pydantic
-openenv-core
