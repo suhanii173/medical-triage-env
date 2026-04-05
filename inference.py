@@ -6,6 +6,8 @@ from graders.triage_grader import grade_action
 
 def run_task(task_func):
     env = MedicalTriageEnv()
+
+    env.reset()
     
     observation, correct = task_func()
     
@@ -18,6 +20,8 @@ def run_task(task_func):
         predicted = "emergency"
     elif "fever" in observation.symptoms:
         predicted = "high"
+    elif "fatigue" in observation.symptoms:
+        predicted = "medium"
     else:
         predicted = "low"
 
