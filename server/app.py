@@ -10,8 +10,9 @@ env = MedicalTriageEnv()
 @app.get("/")
 def home():
     return {"message": "Medical Triage Environment Running"}
-
-@app.get("/reset")
+    
+#OpenEnv required endpoint
+@app.post("/reset")
 def reset():
     obs = env.reset()
     return obs
@@ -21,10 +22,10 @@ def step(action: dict):
     act = Action(**action)
     obs, reward, done, info = env.step(act)
     return {
-        "observation": obs,
+        "observation": obs if isinstance(obs, dict) else obs.__dict__,
         "reward": reward.score,
         "done": done,
-        "info": info
+        "info": info if isinstance(info, dict) else {}
     }
 
 #  REQUIRED MAIN FUNCTION
