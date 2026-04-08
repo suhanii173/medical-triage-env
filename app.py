@@ -1,67 +1,173 @@
+import sys
+import os
+sys.path.append(os.path.abspath("."))
+
 import gradio as gr
 from env.environment import MedicalTriageEnv
-from env.models import Action, Observation
 
 env = MedicalTriageEnv()
 
-def run_triage(age, symptoms, heart_rate, bp):
 
-    symptoms_list = [s.strip().lower() for s in symptoms.split(",")]
+def run_triage(age, manual_symptoms, selected_symptoms, heart_rate, bp):
 
-    obs = Observation(
-        patient_id=1,
-        age=age,
-        symptoms=symptoms_list,
-        heart_rate=heart_rate,
-        bp=bp
-    )
+    #  Validation
+    if age is None or age < 0 or age > 120:
+        return "❌ ERROR", "0%", "Invalid age (0–120 only)", "0%"
 
-    env.state_data = obs
+    if heart_rate is None or heart_rate < 30 or heart_rate > 200:
+        return "❌ ERROR", "0%", "Invalid heart rate (30–200 bpm)", "0%"
 
-    # smarter logic
-    if "chest pain" in symptoms_list or heart_rate > 110:
-        pred = "🚨 EMERGENCY"
-        score = 1.0
-        reason = "Critical condition detected. Immediate medical attention required."
-    elif "fever" in symptoms_list or heart_rate > 95:
-        pred = "⚠️ HIGH"
-        score = 0.8
-        reason = "High-risk condition. Needs urgent care."
-    elif "fatigue" in symptoms_list:
-        pred = "🟡 MEDIUM"
-        score = 0.5
-        reason = "Moderate condition. Monitor closely."
+    if not bp or "/" not in bp:
+        return "❌ ERROR", "0%", "Enter BP like 120/80", "0%"
+
+    if not manual_symptoms and not selected_symptoms:
+        return "❌ ERROR", "0%", "Enter or select symptoms", "0%"
+
+    symptoms_list = []
+
+    if manual_symptoms:
+        symptoms_list += [s.strip().lower() for s in manual_symptoms.split(",")]
+
+    if selected_symptoms:
+        symptoms_list += [s.lower() for s in selected_symptoms]
+
+    symptoms_text = " ".join(symptoms_list)
+
+    score = 0
+    reasons = []
+
+   
+    if any(word in symptoms_text for word in ["chest", "pressure", "tightness"]):
+        score += 50
+        reasons.append("Possible cardiac issue")
+
+    if any(word in symptoms_text for word in ["breath", "breathing"]):
+        score += 30
+        reasons.append("Breathing difficulty")
+
+    if any(word in symptoms_text for word in ["fever", "infection"]):
+        score += 20
+        reasons.append("Fever or infection")
+
+    if any(word in symptoms_text for word in ["fatigue", "weakness"]):
+        score += 10
+        reasons.append("General weakness")
+
+    if any(word in symptoms_text for word in ["dizziness", "headache"]):
+        score += 10
+        reasons.append("Neurological symptoms")
+
+    #  Vitals
+    if heart_rate > 110:
+        score += 30
+        reasons.append("High heart rate")
+    elif heart_rate > 90:
+        score += 15
+        reasons.append("Elevated heart rate")
+
+    if age > 60:
+        score += 20
+        reasons.append("Elderly patient")
+
+    #  Decision
+    if score >= 80:
+        level = "🚨 EMERGENCY"
+    elif score >= 50:
+        level = "⚠️ HIGH"
+    elif score >= 25:
+        level = "🟡 MEDIUM"
     else:
-        pred = "🟢 LOW"
-        score = 0.2
-        reason = "Low risk. Basic care sufficient."
+        level = "🟢 LOW"
 
-    return pred, score, reason
+    #  Confidence 
+    confidence = min(95, 50 + score // 2)
+
+    explanation = "\n".join(reasons) if reasons else "No major risk factors."
+
+    return level, f"{score}%", explanation, f"{confidence}%"
 
 
-with gr.Blocks() as demo:
-    
+
+css = """
+body {
+    background: #000;
+    color: #fff;
+}
+.gr-box {
+    background: #111 !important;
+    border-radius: 12px !important;
+}
+input, textarea {
+    background: #222 !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+}
+.gr-button {
+    background: #222 !important;
+    color: #fff !important;
+    border-radius: 12px !important;
+}
+.gr-button:hover {
+    background: #fff !important;
+    color: #000 !important;
+}
+"""
+
+
+with gr.Blocks(css=css) as demo:
+
     gr.Markdown("# 🏥 AI Medical Triage System")
-    gr.Markdown("### Simulating real-world hospital emergency prioritization using AI")
+    gr.Markdown(" Intelligent Patient Risk-Assesement(OpenEnv-based)")
 
     with gr.Row():
-        with gr.Column():
-            age = gr.Number(label="👤 Age")
-            symptoms = gr.Textbox(label="🩺 Symptoms (comma separated)", placeholder="e.g. chest pain, fever")
-            heart_rate = gr.Number(label="❤️ Heart Rate")
-            bp = gr.Textbox(label="🩸 Blood Pressure")
 
-            submit = gr.Button("🔍 Analyze Patient", variant="primary")
-
+        # INPUT
         with gr.Column():
+            gr.Markdown("### 👤 Patient Input")
+
+            age = gr.Number(label="Age (0–120)", minimum=0, maximum=120)
+
+            manual_symptoms = gr.Textbox(
+                label="📝 Enter Symptoms",
+                placeholder="chest pain, fever"
+            )
+
+            selected_symptoms = gr.CheckboxGroup(
+                choices=[
+                    "Chest Pain",
+                    "Fever",
+                    "Shortness of Breath",
+                    "Fatigue",
+                    "Headache",
+                    "Dizziness"
+                ],
+                label="⚡ Or Select Symptoms"
+            )
+
+            heart_rate = gr.Number(label="❤️ Heart Rate (30–200)", minimum=30, maximum=200)
+
+            bp = gr.Textbox(label="🩸 Blood Pressure (e.g. 120/80)")
+
+            submit = gr.Button("🚀 Analyze Patient")
+
+        # OUTPUT
+        with gr.Column():
+            gr.Markdown("### 📊 Triage Result")
+
             output1 = gr.Textbox(label="🚦 Triage Level")
             output2 = gr.Textbox(label="📊 Risk Score")
             output3 = gr.Textbox(label="🧠 Explanation")
+            output4 = gr.Textbox(label="🤖 AI Confidence")
 
     submit.click(
         fn=run_triage,
-        inputs=[age, symptoms, heart_rate, bp],
-        outputs=[output1, output2, output3]
+        inputs=[age, manual_symptoms, selected_symptoms, heart_rate, bp],
+        outputs=[output1, output2, output3, output4]
     )
 
-demo.launch()
+    gr.Markdown("⚠️ *Simulation only. Not real medical advice.*")
+
+
+if __name__ == "__main__":
+    demo.launch()
+ 
