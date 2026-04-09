@@ -20,17 +20,19 @@ class MedicalTriageEnv:
     def step(self, action: Action):
         correct = "emergency"
 
-        # YOUR ORIGINAL LOGIC (unchanged)
+        # SAME LOGIC, JUST FIXED VALUES
         if action.triage_level == correct:
-            reward_value = 1.0
+            reward_value = 0.9   
             self.done = True
         elif action.triage_level == "high":
-            reward_value = 0.5
+            reward_value = 0.5   # ok
             self.done = True
         else:
-            reward_value = -0.2
+            reward_value = 0.1  
 
-        # NEW: Wrap into Reward model (OpenEnv requirement)
+        # 🔒 SAFETY CLAMP (VERY IMPORTANT)
+        reward_value = max(0.01, min(reward_value, 0.99))
+
         reward = Reward(score=reward_value)
 
         return self.state_data, reward, self.done, {
