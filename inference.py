@@ -5,15 +5,14 @@ from openai import OpenAI
 # 🔑 REQUIRED ENV VARIABLES
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
-HF_TOKEN = os.getenv("HF_TOKEN")
+API_KEY = os.getenv("API_KEY")
 
-if HF_TOKEN is None:
-    raise ValueError("HF_TOKEN environment variable is required")
+if API_KEY is None:
+    raise ValueError("API_KEY environment variable is required")
 
-# 🤖 OpenAI client (MANDATORY by rules)
 client = OpenAI(
     base_url=API_BASE_URL,
-    api_key=HF_TOKEN
+    api_key=API_KEY
 )
 
 # 🔗 YOUR HF SPACE URL
@@ -52,7 +51,17 @@ def run_episode(task_name):
         while not done and step_count < 5:
             step_count += 1
 
-            action = decide_action(obs)
+            response_llm = client.chat.completions.create(
+    model=MODEL_NAME,
+    messages=[
+        {
+            "role": "user",
+            "content": f"Patient data: {obs}. Decide triage level: low, medium, high, or emergency."
+        }
+    ]
+)
+
+action = response_llm.choices[0].message.content.strip().lower()
 
             # 🔁 STEP
             response = requests.post(
