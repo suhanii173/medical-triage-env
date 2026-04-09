@@ -6,7 +6,7 @@ environment:
   entry_point: env.environment:MedicalTriageEnv
 
 graders:
-  - graders.triage_grader:grade_action
+  - graders.triage_grader:grade_episode
 
 observation_space:
   type: object
