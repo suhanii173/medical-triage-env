@@ -5,11 +5,12 @@ version: 1.0
 environment:
   entry_point: env.environment:MedicalTriageEnv
 
+graders:
+  - graders.triage_grader:grade_action
+
 observation_space:
   type: object
   properties:
-    patient_id:
-      type: integer
     age:
       type: integer
     symptoms:
@@ -20,6 +21,11 @@ observation_space:
       type: integer
     bp:
       type: string
+  required:
+    - age
+    - symptoms
+    - heart_rate
+    - bp
 
 action_space:
   type: object
@@ -27,10 +33,13 @@ action_space:
     triage_level:
       type: string
       enum: ["low", "medium", "high", "emergency"]
+  required:
+    - triage_level
 
 reward:
-  type: float
-  range: [-1.0, 1.0]
+  type: number
+  minimum: -1.0
+  maximum: 1.0
 
 tasks:
   - name: easy
