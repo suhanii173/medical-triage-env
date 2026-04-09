@@ -70,6 +70,11 @@ def run_episode(task_name):
             ).json()
 
             reward = float(response["reward"])
+            if reward <= 0:
+             reward = 0.10
+            elif reward >= 1:
+             reward = 0.90
+                
             done = response["done"]
             error = None
 
@@ -104,3 +109,4 @@ if __name__ == "__main__":
     run_episode("easy")
     run_episode("medium")
     run_episode("hard")
+    
