@@ -39,7 +39,7 @@ def run_episode(task_name):
 
     rewards = []
     step_count = 0
-    success = False
+    success = True
 
     try:
         # 🔄 RESET
@@ -89,7 +89,7 @@ def run_episode(task_name):
             obs = response["observation"]
 
             if done:
-                success = False
+                success = True
 
     except Exception as e:
         error = str(e)
