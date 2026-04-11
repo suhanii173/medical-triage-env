@@ -41,27 +41,27 @@ reward:
   maximum: 1.0
 
 tasks:
-  - id: easy
-    difficulty: easy
+  - name: easy
+    description: Basic cold symptoms
     grader:
       type: llm
       prompt_template: |
         You are evaluating a medical triage agent.
-        Based on the interaction, give a score strictly between 0.1 and 0.9.
+        Give a score strictly between 0.1 and 0.9.
         Return ONLY a number.
-  - id: medium
-    difficulty: medium
+  - name: medium
+    description: Fever and fatigue
     grader:
       type: llm
       prompt_template: |
         You are evaluating a medical triage agent.
-        Based on the interaction, give a score strictly between 0.1 and 0.9.
+        Give a score strictly between 0.1 and 0.9.
         Return ONLY a number.
-  - id: hard
-    difficulty: hard
+  - name: hard
+    description: Critical heart symptoms
     grader:
       type: llm
       prompt_template: |
         You are evaluating a medical triage agent.
-        Based on the interaction, give a score strictly between 0.1 and 0.9.
+        Give a score strictly between 0.1 and 0.9.
         Return ONLY a number.
