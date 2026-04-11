@@ -33,7 +33,7 @@ class MedicalTriageEnv:
         # 🔒 SAFETY CLAMP (VERY IMPORTANT)
         reward_value = max(0.01, min(reward_value, 0.99))
 
-        reward = Reward(score=reward_value)
+        reward = reward_value
 
         return self.state_data, reward, self.done, {
             "correct": action.triage_level == correct
