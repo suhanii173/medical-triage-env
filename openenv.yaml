@@ -46,22 +46,39 @@ tasks:
     grader:
       type: llm
       prompt_template: |
-        You are evaluating a medical triage agent.
-        Give a score strictly between 0.1 and 0.9.
-        Return ONLY a number.
+        You are grading a medical triage agent.
+        Based on the actions taken, return a score strictly between 0.1 and 0.9.
+
+        IMPORTANT:
+        - Output ONLY a decimal number
+        - Do NOT output 0 or 1
+        - Do NOT include any text, explanation, or symbols
+        - Example valid output: 0.75
+
   - name: medium
     description: Fever and fatigue
     grader:
       type: llm
       prompt_template: |
-        You are evaluating a medical triage agent.
-        Give a score strictly between 0.1 and 0.9.
-        Return ONLY a number.
+        You are grading a medical triage agent.
+        Based on the actions taken, return a score strictly between 0.1 and 0.9.
+
+        IMPORTANT:
+        - Output ONLY a decimal number
+        - Do NOT output 0 or 1
+        - Do NOT include any text, explanation, or symbols
+        - Example valid output: 0.75
+
   - name: hard
     description: Critical heart symptoms
     grader:
       type: llm
       prompt_template: |
-        You are evaluating a medical triage agent.
-        Give a score strictly between 0.1 and 0.9.
-        Return ONLY a number.
+        You are grading a medical triage agent.
+        Based on the actions taken, return a score strictly between 0.1 and 0.9.
+
+        IMPORTANT:
+        - Output ONLY a decimal number
+        - Do NOT output 0 or 1
+        - Do NOT include any text, explanation, or symbols
+        - Example valid output: 0.75
