@@ -41,44 +41,17 @@ reward:
   maximum: 1.0
 
 tasks:
-  - name: easy
-    description: Basic cold symptoms
-    grader:
-      type: llm
-      prompt_template: |
-        You are grading a medical triage agent.
-        Based on the actions taken, return a score strictly between 0.1 and 0.9.
+  - id: easy_task
+    name: easy
+    difficulty: easy
+    grader: server.graders:EasyGrader
 
-        IMPORTANT:
-        - Output ONLY a decimal number
-        - Do NOT output 0 or 1
-        - Do NOT include any text, explanation, or symbols
-        - Example valid output: 0.75
+  - id: medium_task
+    name: medium
+    difficulty: medium
+    grader: server.graders:MediumGrader
 
-  - name: medium
-    description: Fever and fatigue
-    grader:
-      type: llm
-      prompt_template: |
-        You are grading a medical triage agent.
-        Based on the actions taken, return a score strictly between 0.1 and 0.9.
-
-        IMPORTANT:
-        - Output ONLY a decimal number
-        - Do NOT output 0 or 1
-        - Do NOT include any text, explanation, or symbols
-        - Example valid output: 0.75
-
-  - name: hard
-    description: Critical heart symptoms
-    grader:
-      type: llm
-      prompt_template: |
-        You are grading a medical triage agent.
-        Based on the actions taken, return a score strictly between 0.1 and 0.9.
-
-        IMPORTANT:
-        - Output ONLY a decimal number
-        - Do NOT output 0 or 1
-        - Do NOT include any text, explanation, or symbols
-        - Example valid output: 0.75
+  - id: hard_task
+    name: hard
+    difficulty: hard
+    grader: server.graders:HardGrader
